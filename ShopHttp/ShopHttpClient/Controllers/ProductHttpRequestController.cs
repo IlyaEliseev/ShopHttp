@@ -4,7 +4,6 @@ using System.Text;
 using Newtonsoft.Json;
 using ShopHttp.ShopModels.Models;
 using System.Collections.Generic;
-using System.Net;
 
 namespace ShopHttp.ShopHttpClient.Controllers
 {

@@ -7,7 +7,7 @@ using System.Net;
 
 namespace ShopHttp.ShopHttpServer.HttpResponceControllers
 {
-    internal class ProductArchiveHttpController
+    internal class ProductArchiveHttpController : IHttpController
     {
         public ProductArchiveHttpController(IProductArchiveController productArchiveController, IPathController productArchivePathController)
         {

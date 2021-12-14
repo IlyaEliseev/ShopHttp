@@ -20,9 +20,9 @@ namespace ShopHttp.ShopHttpServer
             IPathController showcasetPathController = new ShowcasePathController(showcaseController);
             IPathController productOnShowcasePathController = new ProductOnShowcasePathController();
             IPathController productArchivePathController = new ProductArchivePathController(productArchiveController);
-            ProductHttpController productHttpController = new ProductHttpController(productController, productPathController);
-            ShowcaseHttpController showcaseHttpController = new ShowcaseHttpController(showcasetPathController, productOnShowcasePathController, showcaseController);
-            ProductArchiveHttpController productArchiveHttpController = new ProductArchiveHttpController(productArchiveController, productArchivePathController);
+            IHttpController productHttpController = new ProductHttpController(productController, productPathController);
+            IHttpController showcaseHttpController = new ShowcaseHttpController(showcasetPathController, productOnShowcasePathController, showcaseController);
+            IHttpController productArchiveHttpController = new ProductArchiveHttpController(productArchiveController, productArchivePathController);
             var shopServerApplication = new ShopServerApplication(httpListener, productHttpController, showcaseHttpController, productArchiveHttpController);
             shopServerApplication.Run();
         }

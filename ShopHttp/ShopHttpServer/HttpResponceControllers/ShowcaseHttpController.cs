@@ -8,7 +8,7 @@ using System.Net;
 
 namespace ShopHttp.ShopHttpServer.HttpResponceControllers
 {
-    public class ShowcaseHttpController
+    public class ShowcaseHttpController : IHttpController
     {
         public ShowcaseHttpController(IPathController showcasePathController, IPathController productObShowcasePathController, IShowcaseController showcaseController)
         {
@@ -58,7 +58,7 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
             }
         }
 
-        private void  GetShowcaseInfotmation(HttpListenerContext context)
+        private void GetShowcaseInfotmation(HttpListenerContext context)
         {
             var showcases = ShowcaseController.GetShowcases();
             var responceBody = JsonConvert.SerializeObject(showcases, Formatting.Indented);

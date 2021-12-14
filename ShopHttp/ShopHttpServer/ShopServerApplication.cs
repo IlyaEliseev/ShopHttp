@@ -6,8 +6,8 @@ namespace ShopHttp.ShopHttpServer
 {
     internal class ShopServerApplication
     {
-        public ShopServerApplication(HttpListener httpListener, ProductHttpController productHttpController, ShowcaseHttpController showcasetHttpController,
-                                    ProductArchiveHttpController productArchiveHttpController)
+        public ShopServerApplication(HttpListener httpListener, IHttpController productHttpController, IHttpController showcasetHttpController,
+                                    IHttpController productArchiveHttpController)
         {
             _httpListener = httpListener;
             ProductHttpController = productHttpController;
@@ -16,9 +16,9 @@ namespace ShopHttp.ShopHttpServer
         }
 
         private readonly HttpListener _httpListener;
-        public ProductHttpController ProductHttpController { get; set; }
-        public ShowcaseHttpController ShowcasetHttpController { get; set; }
-        public ProductArchiveHttpController ProductArchiveHttpController { get; set; }
+        public IHttpController ProductHttpController { get; }
+        public IHttpController ShowcasetHttpController { get; }
+        public IHttpController ProductArchiveHttpController { get; }
 
         internal void Run()
         {

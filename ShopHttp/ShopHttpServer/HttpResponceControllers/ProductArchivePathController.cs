@@ -15,6 +15,7 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
         public IProductArchiveController ProductArchiveController { get; set; }
         public string Path => "/app/archiveProduct";
 
+        //add if collection not contains path
         public void AddPath(string path)
         {
             if (!_pathes.Contains(path) && _pathes.Count <= ProductArchiveController.GetArchiveProductCount())

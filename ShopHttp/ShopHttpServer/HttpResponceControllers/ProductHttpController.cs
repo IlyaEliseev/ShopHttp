@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using ShopHttp.ShopHttpServer.Controllers;
+using ShopHttp.ShopHttpServer.Services;
 using ShopHttp.ShopModels.Models;
 using System;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Net;
 
 namespace ShopHttp.ShopHttpServer.HttpResponceControllers
 {
-    public class ProductHttpController
+    public class ProductHttpController : IHttpController
     {
         public ProductHttpController(IProductController productController, IPathController productPathController)
         {
@@ -35,7 +36,7 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
                         {
                             EditProduct(context);
                         }
-                        catch (Exception ex)
+                        catch (IdNotFoundException ex)
                         {
                             StreamDataController.SetResponce(ex.Message, context);
                         }
@@ -46,6 +47,10 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
             if (path == ProductPathController.FindPath(path) && context.Request.HttpMethod == "DELETE")
             {
                 DeleteProduct(context);
+            }
+            else
+            {
+                StreamDataController.SetResponce("Id is not found", context);
             }
         }
 
@@ -62,7 +67,6 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
             {
                 context.Response.StatusCode = (int)HttpStatusCode.NoContent;
             }    
-            
         }
 
         private void CreateProduct(HttpListenerContext context)

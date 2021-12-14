@@ -28,7 +28,6 @@ namespace ShopHttp.ShopHttpServer.Controllers
             Showcase showcase = new Showcase(showcaseName, showcaseVolume);
             UnitOfWork.ShowcaseRepository.Add(showcase);
             showcase.Id = UnitOfWork.ShowcaseRepository.GetCount();
-            NotifyService.RaiseCreateShowcaseIsDone();
         }
 
         public void DeleteShowcase(int showcaseId)
@@ -69,14 +68,12 @@ namespace ShopHttp.ShopHttpServer.Controllers
                         ProductController.DeleteProduct(productId);
                         selectProduct.IdInShowcase = selectShowcase.GetProductCount();
                         selectProduct.IdShowcase = showcaseId;
-                        //NotifyService.RaisePlaceProductIsDone();
                     }
                 }
             }
             else
             {
                 throw new IdNotFoundException("Id not found");
-                //NotifyService.RaiseSearchProductIdIsNotSuccessful();
             }
         }
 
@@ -103,7 +100,6 @@ namespace ShopHttp.ShopHttpServer.Controllers
             else
             {
                 throw new IdNotFoundException("Id not found");
-                //NotifyService.RaiseSearchProductIdIsNotSuccessful();
             }
         }
 
@@ -144,7 +140,6 @@ namespace ShopHttp.ShopHttpServer.Controllers
                         var selectProduct = selectShowcase.UnitOfWork.ProductOnShowcaseRepository.GetById(productId);
                         selectProduct.Name = productName;
                         selectProduct.Volume = productVolume;
-                        NotifyService.RaiseEditProductIsDone();
                     }
                     else
                     {
@@ -158,31 +153,10 @@ namespace ShopHttp.ShopHttpServer.Controllers
             }
         }
 
-        public void GetShowcaseInformation()
-        {
-            if (CheckShowcaseAvailability())
-            {
-                Console.WriteLine("Showcases:");
-                var selectShowcase = from s in UnitOfWork.ShowcaseRepository.GetAll()
-                                     select s;
-                foreach (var showcase in selectShowcase)
-                {
-                    Console.WriteLine($"Id: {showcase.Id} | Name: {showcase.Name} | Volume: {showcase.Volume} | Time to Create: {showcase.TimeToCreate} | Count Products: {showcase.GetProductCount()} | VolumeCount: {showcase.VolumeCount}");
-                    var products = from p in showcase.UnitOfWork.ProductOnShowcaseRepository.GetAll()
-                                   select p;
-                    foreach (var p in products)
-                    {
-                        Console.WriteLine($"    Id: {p.IdInShowcase} | Name: {p.Name} | Volume: {p.Volume} | Time to Create: {p.TimeToCreate}");
-                    }
-                }
-            }
-        }
-
         public bool CheckShowcaseAvailability()
         {
             if (GetShowcaseCount() == 0)
             {
-                NotifyService.RaiseCountCheck();
                 return false;
             }
             else
@@ -215,7 +189,6 @@ namespace ShopHttp.ShopHttpServer.Controllers
             var findShowcase = UnitOfWork.ShowcaseRepository.GetById(showcaseId);
             if (findShowcase.UnitOfWork.ProductOnShowcaseRepository.GetCount() != 0)
             {
-                //NotifyService.RaiseDeleteError();
                 return false;
             }
             else
@@ -232,7 +205,6 @@ namespace ShopHttp.ShopHttpServer.Controllers
             {
                 return true;
             }
-            //NotifyService.RaiseVolumeErrorMessage();
             return false;
         }
 
@@ -241,7 +213,6 @@ namespace ShopHttp.ShopHttpServer.Controllers
             var selectShowcase = UnitOfWork.ShowcaseRepository.GetById(showcaseId); 
             if (selectShowcase.UnitOfWork.ProductOnShowcaseRepository.GetCount() == 0)
             {
-                //NotifyService.RaiseChekProductOnShowacse();
                 return false;
             }
             else
