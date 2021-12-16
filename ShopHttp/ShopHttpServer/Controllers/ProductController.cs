@@ -1,5 +1,4 @@
-﻿using System;
-using ShopHttp.ShopHttpServer.Services;
+﻿using ShopHttp.ShopHttpServer.Services;
 using ShopHttp.ShopHttpServer.DAL;
 using ShopHttp.ShopHttpServer.Models;
 using System.Linq;
@@ -9,15 +8,12 @@ namespace ShopHttp.ShopHttpServer.Controllers
 {
     public class ProductController : IProductController
     {
-        public ProductController(NotifyService notifyService, CheckService checkService)
+        public ProductController()
         {
-            NotifyService = notifyService;
-            CheckService = checkService;
             UnitOfWork = new UnitOfWork();
         }
 
         public IUnitOfWork UnitOfWork { get; }
-        public NotifyService NotifyService { get; }
         public CheckService CheckService { get; }
 
         public void CreateProduct(string productName, double productVolume)

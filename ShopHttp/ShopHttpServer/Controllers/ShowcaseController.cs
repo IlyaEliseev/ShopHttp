@@ -45,10 +45,6 @@ namespace ShopHttp.ShopHttpServer.Controllers
                     throw new NotEmptyCollectionException("Showcase not empty. You may delete only empty showcases");
                 }
             }
-            else
-            {
-                throw new IdNotFoundException("Id not found");
-            }
         }
 
         public void PlaceProductOnShowcase(int productId, int showcaseId)
@@ -115,7 +111,7 @@ namespace ShopHttp.ShopHttpServer.Controllers
                 var selectShowcase = UnitOfWork.ShowcaseRepository.GetById(showcaseId); 
                 var products = from p in selectShowcase.UnitOfWork.ProductOnShowcaseRepository.GetAll()
                                select p;
-                if (CheckProductOnCurrentShowcase(showcaseId))
+                if (products.Count() != 0)
                 {
                     throw new NotEmptyCollectionException("Showcase not empty. You may Edite only empty showcases");
                 }

@@ -11,11 +11,10 @@ namespace ShopHttp.ShopHttpServer
         {
             var httpListener = new HttpListener();
             httpListener.Prefixes.Add("http://localhost:44987/");
-            var notifyService = new NotifyService();
             var checkService = new CheckService();
-            IProductController productController = new ProductController(notifyService, checkService);
-            IShowcaseController showcaseController = new ShowcaseController(notifyService, checkService, productController);
-            IProductArchiveController productArchiveController = new ProductArchiveController(notifyService, showcaseController, checkService);
+            IProductController productController = new ProductController();
+            IShowcaseController showcaseController = new ShowcaseController(productController);
+            IProductArchiveController productArchiveController = new ProductArchiveController(showcaseController, checkService);
             IPathController productPathController = new ProductPathController(productController);
             IPathController showcasetPathController = new ShowcasePathController(showcaseController);
             IPathController productOnShowcasePathController = new ProductOnShowcasePathController();

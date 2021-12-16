@@ -10,7 +10,7 @@ namespace ShopHttp.ShopHttpClient
         private static void Main(string[] args)
         {
             var httpclient = new HttpClient();
-            var baseUri = new Uri("http://localhost:44987");
+            var baseUri = new Uri("http://localhost:44987/");
             var checkService = new CheckService();
             var productHttpController = new ProductHttpRequestController(httpclient, baseUri);
             var showcaseHttpController = new ShowcaseHttpRequestController(httpclient, baseUri);

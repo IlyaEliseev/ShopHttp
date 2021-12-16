@@ -48,10 +48,6 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
             {
                 DeleteProduct(context);
             }
-            else
-            {
-                StreamDataController.SetResponce("Id is not found", context);
-            }
         }
 
         private void GetProductInformation(HttpListenerContext context)

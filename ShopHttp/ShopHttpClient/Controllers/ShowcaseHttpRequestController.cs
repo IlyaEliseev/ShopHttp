@@ -38,15 +38,29 @@ namespace ShopHttp.ShopHttpClient.Controllers
         public void DeleteProductOnShowcase(int showcaseId, int productId)
         {
             var responce = _httpClient.DeleteAsync($"app/showcase/{showcaseId}/product/{productId}").Result;
-            var content = responce.Content.ReadAsStringAsync().Result;
-            Console.WriteLine(content);
+            if ((int)responce.StatusCode == 200)
+            {
+                var content = responce.Content.ReadAsStringAsync().Result;
+                Console.WriteLine(content);
+            }
+            else
+            {
+                Console.WriteLine("Id is not found");
+            }
         }
 
         public void DeleteShowcase(int showcaseId)
         {
             var responce = _httpClient.DeleteAsync(_showcasPath + $"/{showcaseId}").Result;
-            var content = responce.Content.ReadAsStringAsync().Result;
-            Console.WriteLine(content);
+            if ((int)responce.StatusCode == 200)
+            {
+                var content = responce.Content.ReadAsStringAsync().Result;
+                Console.WriteLine(content);
+            }
+            else
+            {
+                Console.WriteLine("Id is not found");
+            }
         }
 
         public void EditeProductOnShowcase(int productId, int showcaseId, string productName, double productVolume)
@@ -85,17 +99,23 @@ namespace ShopHttp.ShopHttpClient.Controllers
         public void GetShowcaseInformation()
         {
             var resopnce = _httpClient.GetAsync(_showcasPath).Result;
-            var content = resopnce.Content.ReadAsStringAsync().Result;
-            var showcases = JsonConvert.DeserializeObject<List<Showcase>>(content);
-
-            Console.WriteLine("Showcases:");
-            foreach (var showcase in showcases)
+            if ((int)resopnce.StatusCode == 200)
             {
-                Console.WriteLine($"Id: {showcase.Id} | Name: {showcase.Name} | Volume: {showcase.Volume} | Time to Create: {showcase.TimeToCreate} | Count Products: {showcase.UnitOfWork.ProductOnShowcaseRepository.GetCount()}| VolumeCount: {showcase.VolumeCount}");
-                foreach (var p in showcase.UnitOfWork.ProductOnShowcaseRepository.GetAll())
+                var content = resopnce.Content.ReadAsStringAsync().Result;
+                var showcases = JsonConvert.DeserializeObject<List<Showcase>>(content);
+                Console.WriteLine("Showcases:");
+                foreach (var showcase in showcases)
                 {
-                    Console.WriteLine($"    Id: {p.IdInShowcase} | Name: {p.Name} | Volume: {p.Volume} | Time to Create: {p.TimeToCreate}");
+                    Console.WriteLine($"Id: {showcase.Id} | Name: {showcase.Name} | Volume: {showcase.Volume} | Time to Create: {showcase.TimeToCreate} | Count Products: {showcase.UnitOfWork.ProductOnShowcaseRepository.GetCount()}| VolumeCount: {showcase.VolumeCount}");
+                    foreach (var p in showcase.UnitOfWork.ProductOnShowcaseRepository.GetAll())
+                    {
+                        Console.WriteLine($"    Id: {p.IdInShowcase} | Name: {p.Name} | Volume: {p.Volume} | Time to Create: {p.TimeToCreate}");
+                    }
                 }
+            }
+            else
+            {
+                Console.WriteLine("Showcases is empty");
             }
         }
 

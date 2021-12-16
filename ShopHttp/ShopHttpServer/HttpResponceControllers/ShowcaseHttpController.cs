@@ -41,13 +41,13 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
                         }
                         catch (IdNotFoundException ex)
                         {
-                            Console.WriteLine(ex.Message);
+                            StreamDataController.SetResponce(ex.Message, context);
                         }
                         catch (NotEmptyCollectionException ex)
                         {
-                            Console.WriteLine(ex.Message);
+                            StreamDataController.SetResponce(ex.Message, context);
                         }
-                        
+
                         break;
                     case "PATCH":
                         try
@@ -57,11 +57,11 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
                         catch (IdNotFoundException ex)
                         {
 
-                            Console.WriteLine(ex.Message); 
+                            StreamDataController.SetResponce(ex.Message, context);
                         }
                         catch (NotEnoughSpaceException ex)
                         {
-                            Console.WriteLine(ex.Message);
+                            StreamDataController.SetResponce(ex.Message, context);
                         }
 
                         break;
@@ -76,25 +76,48 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
                 }
                 catch (NotEmptyCollectionException ex)
                 {
-
-                    Console.WriteLine(ex.Message);
+                    StreamDataController.SetResponce(ex.Message, context);
                 }
-                
             }
             else
             {
-                StreamDataController.SetResponce("Id is not found", context);
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
             }
-
 
             if (path == ProductOnShowcasePathController.Path && context.Request.HttpMethod == "PUT")
             {
-                EditeProductOnShowcase(context);
+                try
+                {
+                    EditeProductOnShowcase(context);
+                }
+                catch (IdNotFoundException ex)
+                {
+                    StreamDataController.SetResponce(ex.Message, context);
+                }
+                catch (ProductNotFoundException ex)
+                {
+                    StreamDataController.SetResponce(ex.Message, context);
+                }
+                catch (NotEnoughSpaceException ex)
+                {
+                    StreamDataController.SetResponce(ex.Message, context);
+                }
             }
 
             if (path == ProductOnShowcasePathController.FindPath(path) && context.Request.HttpMethod == "DELETE")
             {
-                DeleteProductOnShowcase(context);
+                try
+                {
+                    DeleteProductOnShowcase(context);
+                }
+                catch (IdNotFoundException ex)
+                {
+                    StreamDataController.SetResponce(ex.Message, context);
+                }
+            }
+            else
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
             }
         }
 

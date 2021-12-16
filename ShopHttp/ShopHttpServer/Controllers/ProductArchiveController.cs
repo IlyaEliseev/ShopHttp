@@ -9,15 +9,14 @@ namespace ShopHttp.ShopHttpServer.Controllers
 {
     public class ProductArchiveController : IProductArchiveController
     {
-        public ProductArchiveController(NotifyService notifyService, IShowcaseController showcaseController, CheckService checkService)
+        public ProductArchiveController(IShowcaseController showcaseController, CheckService checkService)
         {
-            NotifyService = notifyService;
             ShowcaseController = showcaseController;
             CheckService = checkService;
             UnitOfWork = new UnitOfWork();
         }
 
-        public NotifyService NotifyService { get; }
+        
         public IShowcaseController ShowcaseController { get; }
         public CheckService CheckService { get; }
         public IUnitOfWork UnitOfWork { get; }
