@@ -10,18 +10,14 @@ namespace ShopHttp.ShopHttpServer.Controllers
     public class ShowcaseController : IShowcaseController
     {
 
-        public ShowcaseController(NotifyService notifyService, CheckService checkService, IProductController productController)
+        public ShowcaseController(IProductController productController)
         {
-            NotifyService = notifyService;
-            CheckService = checkService;
             ProductController = productController;
             UnitOfWork = new UnitOfWork();
         }
 
         public IUnitOfWork UnitOfWork { get; }
         public IProductController ProductController { get; }
-        public NotifyService NotifyService { get; }
-        public CheckService CheckService { get; }
 
         public void CreateShowcase(string showcaseName, double showcaseVolume)
         {
@@ -37,7 +33,6 @@ namespace ShopHttp.ShopHttpServer.Controllers
                 if (CheckShowcaseCount(showcaseId))
                 {
                     UnitOfWork.ShowcaseRepository.DeleteById(showcaseId);
-                    NotifyService.RaiseDeleteShowcaseIsDone();
                     var showcase = from s in UnitOfWork.ShowcaseRepository.GetAll()
                                    select s;
                     for (int i = 0; i < GetShowcaseCount(); i++)
@@ -45,11 +40,14 @@ namespace ShopHttp.ShopHttpServer.Controllers
                         showcase.ElementAtOrDefault(i).Id = i + 1;
                     }
                 }
+                else
+                {
+                    throw new NotEmptyCollectionException("Showcase not empty. You may delete only empty showcases");
+                }
             }
             else
             {
                 throw new IdNotFoundException("Id not found");
-                //NotifyService.RaiseSearchProductIdIsNotSuccessful();
             }
         }
 
@@ -57,19 +55,23 @@ namespace ShopHttp.ShopHttpServer.Controllers
         {
             if (GetShowcaseCount() >= showcaseId && ProductController.GetProductCount() >= productId)
             {
-                if (ProductController.CheckProductAvailability() && CheckShowcaseAvailability())
+                //if (ProductController.CheckProductAvailability() && CheckShowcaseAvailability())
+                //{
+                if (CheckShowcaseVolumeOverflow(showcaseId, productId))
                 {
-                    if (CheckShowcaseVolumeOverflow(showcaseId, productId))
-                    {
-                        var selectProduct = ProductController.GetProduct(productId);
-                        var selectShowcase = UnitOfWork.ShowcaseRepository.GetById(showcaseId);
-                        selectShowcase.UnitOfWork.ProductOnShowcaseRepository.Add(selectProduct);
-                        SumShowcaseVolume(showcaseId, productId);
-                        ProductController.DeleteProduct(productId);
-                        selectProduct.IdInShowcase = selectShowcase.GetProductCount();
-                        selectProduct.IdShowcase = showcaseId;
-                    }
+                    var selectProduct = ProductController.GetProduct(productId);
+                    var selectShowcase = UnitOfWork.ShowcaseRepository.GetById(showcaseId);
+                    selectShowcase.UnitOfWork.ProductOnShowcaseRepository.Add(selectProduct);
+                    SumShowcaseVolume(showcaseId, productId);
+                    ProductController.DeleteProduct(productId);
+                    selectProduct.IdInShowcase = selectShowcase.GetProductCount();
+                    selectProduct.IdShowcase = showcaseId;
                 }
+                else
+                {
+                    throw new NotEnoughSpaceException("Not enough space on showcase");
+                }
+                //}
             }
             else
             {
@@ -87,7 +89,6 @@ namespace ShopHttp.ShopHttpServer.Controllers
                 if (CheckProductOnCurrentShowcase(showcaseId))
                 {
                     selectShowcase.UnitOfWork.ProductOnShowcaseRepository.DeleteById(productId);
-                    NotifyService.RaiseDeleteProductIsDone();
                     selectShowcase.VolumeCount -= selectProduct.Volume;
                     var products = from p in selectShowcase.UnitOfWork.ProductOnShowcaseRepository.GetAll()
                                    select p;
@@ -95,6 +96,10 @@ namespace ShopHttp.ShopHttpServer.Controllers
                     {
                         products.ElementAtOrDefault(i).IdInShowcase = i + 1;
                     }
+                }
+                else
+                {
+                    throw new IdNotFoundException("Id not found");
                 }
             }
             else
@@ -110,21 +115,19 @@ namespace ShopHttp.ShopHttpServer.Controllers
                 var selectShowcase = UnitOfWork.ShowcaseRepository.GetById(showcaseId); 
                 var products = from p in selectShowcase.UnitOfWork.ProductOnShowcaseRepository.GetAll()
                                select p;
-                if (products.Count() != 0)
+                if (CheckProductOnCurrentShowcase(showcaseId))
                 {
-                    NotifyService.RaiseDeleteError();
+                    throw new NotEmptyCollectionException("Showcase not empty. You may Edite only empty showcases");
                 }
                 else
                 {
                     selectShowcase.Name = showcaseName;
                     selectShowcase.Volume = showcaseVolume; 
-                    NotifyService.RaiseEditShowcaseIsDone();
                 }
-                
             }
             else
             {
-                NotifyService.RaiseSearchProductIdIsNotSuccessful();
+                throw new IdNotFoundException("Id not found");
             }
         }
 
@@ -143,13 +146,17 @@ namespace ShopHttp.ShopHttpServer.Controllers
                     }
                     else
                     {
-                        NotifyService.RaiseVolumeErrorMessage();
+                        throw new NotEnoughSpaceException("Not enough space on showcase");
                     }
+                }
+                else
+                {
+                    throw new ProductNotFoundException("That product not found");
                 }
             }
             else
             {
-                NotifyService.RaiseSearchProductIdIsNotSuccessful();
+                throw new IdNotFoundException("Id not found");
             }
         }
 

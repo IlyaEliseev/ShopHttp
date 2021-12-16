@@ -11,7 +11,6 @@ namespace ShopHttp.ShopHttpServer.Controllers
         void DeleteProductOnShowcase(int showcaseId, int productId);
         void EditeShowcase(int showcaseId, string showcaseName, double showcaseVolume);
         void EditeProductOnShowcase(int productId, int showcaseId, string productName, double productVolume);
-        void GetShowcaseInformation();
         bool CheckShowcaseAvailability();
         bool CheckShowcaseCount(int showcaseId);
         bool CheckShowcaseVolumeOverflow(int showcaseId, int productId);

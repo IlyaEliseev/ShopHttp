@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using ShopHttp.ShopHttpServer.Controllers;
 using ShopHttp.ShopHttpServer.Models;
+using ShopHttp.ShopHttpServer.Services;
 using ShopHttp.ShopModels.Models;
 using System;
 using System.Linq;
@@ -34,18 +35,57 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
                         CreateShowcase(context);
                         break;
                     case "PUT":
-                        EditeShowcsae(context);
+                        try
+                        {
+                            EditeShowcsae(context);
+                        }
+                        catch (IdNotFoundException ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+                        catch (NotEmptyCollectionException ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+                        
                         break;
                     case "PATCH":
-                        PlaceProductOnShowcase(context);
+                        try
+                        {
+                            PlaceProductOnShowcase(context);
+                        }
+                        catch (IdNotFoundException ex)
+                        {
+
+                            Console.WriteLine(ex.Message); 
+                        }
+                        catch (NotEnoughSpaceException ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+
                         break;
                 }
             }
 
             if (path == ShowcasePathController.FindPath(path) && context.Request.HttpMethod == "DELETE")
             {
-                DeleteShowcase(context);
+                try
+                {
+                    DeleteShowcase(context);
+                }
+                catch (NotEmptyCollectionException ex)
+                {
+
+                    Console.WriteLine(ex.Message);
+                }
+                
             }
+            else
+            {
+                StreamDataController.SetResponce("Id is not found", context);
+            }
+
 
             if (path == ProductOnShowcasePathController.Path && context.Request.HttpMethod == "PUT")
             {
@@ -60,10 +100,18 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
 
         private void GetShowcaseInfotmation(HttpListenerContext context)
         {
-            var showcases = ShowcaseController.GetShowcases();
-            var responceBody = JsonConvert.SerializeObject(showcases, Formatting.Indented);
-            StreamDataController.SetResponce(responceBody, context);
-            context.Response.StatusCode = (int)HttpStatusCode.OK;
+            if (ShowcaseController.GetShowcaseCount() > 0)
+            {
+                var showcases = ShowcaseController.GetShowcases();
+                var responceBody = JsonConvert.SerializeObject(showcases, Formatting.Indented);
+                StreamDataController.SetResponce(responceBody, context);
+                context.Response.StatusCode = (int)HttpStatusCode.OK;
+            }
+            else
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.NoContent;
+            }
+            
         }
 
         private void CreateShowcase(HttpListenerContext context)
