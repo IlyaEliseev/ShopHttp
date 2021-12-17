@@ -14,7 +14,7 @@ namespace ShopHttp.ShopHttpServer
             var checkService = new CheckService();
             IProductController productController = new ProductController();
             IShowcaseController showcaseController = new ShowcaseController(productController);
-            IProductArchiveController productArchiveController = new ProductArchiveController(showcaseController, checkService);
+            IProductArchiveController productArchiveController = new ProductArchiveController(showcaseController);
             IPathController productPathController = new ProductPathController(productController);
             IPathController showcasetPathController = new ShowcasePathController(showcaseController);
             IPathController productOnShowcasePathController = new ProductOnShowcasePathController();

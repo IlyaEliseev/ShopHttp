@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using Newtonsoft.Json;
 using ShopHttp.ShopModels.Models;
@@ -24,7 +25,6 @@ namespace ShopHttp.ShopHttpClient.Controllers
                 ProductInShowcaseId = productId,
                 ShowcaseId = showcaseId
             };
-
             var jsonResponce = JsonConvert.SerializeObject(newResponce);
             var stringResponce = new StringContent(jsonResponce);
             var responce = _httpClient.PostAsync(_productArchivePath, stringResponce).Result;
@@ -34,27 +34,36 @@ namespace ShopHttp.ShopHttpClient.Controllers
 
         public void DeleteArchiveProduct(int productId)
         {
-            var newResponce = new HttpResponceModel()
-            {
-                ProductInArchiveId = productId
-            };
-            var jsonResponce = JsonConvert.SerializeObject(newResponce);
             var responce = _httpClient.DeleteAsync(_productArchivePath + $"/{productId}").Result;
-            var content = responce.Content.ReadAsStringAsync().Result;
-            Console.WriteLine(content);
+            if ((int)responce.StatusCode == 200)
+            {
+                var content = responce.Content.ReadAsStringAsync().Result;
+                Console.WriteLine(content);
+            }
+            else
+            {
+                Console.WriteLine("Id is not found");
+            }
         }
 
         public void GetArchiveInformation()
         {
             var responce = _httpClient.GetAsync(_productArchivePath).Result;
-            var content = responce.Content.ReadAsStringAsync().Result;
-            var archiveProducts = JsonConvert.DeserializeObject<List<ProductModel>>(content);
-
-            Console.WriteLine("Archive:");
-            foreach (var product in archiveProducts)
+            if (responce.StatusCode == HttpStatusCode.OK)
             {
-                Console.WriteLine($"Id: {product.IdInArchive} | Name product: {product.Name} | Volume product: {product.Volume} | Time to create: {product.TimeToArchive}");
+                var content = responce.Content.ReadAsStringAsync().Result;
+                var archiveProducts = JsonConvert.DeserializeObject<List<ProductModel>>(content);
+                Console.WriteLine("Archive:");
+                foreach (var product in archiveProducts)
+                {
+                    Console.WriteLine($"Id: {product.IdInArchive} | Name product: {product.Name} | Volume product: {product.Volume} | Time to create: {product.TimeToArchive}");
+                }
             }
+            else
+            {
+                Console.WriteLine("Archive is empty");
+            }
+            
         }
 
         public void UnArchivateProduct(int productId)
@@ -63,7 +72,6 @@ namespace ShopHttp.ShopHttpClient.Controllers
             {
                 ProductInArchiveId = productId,
             };
-
             var jsonResponce = JsonConvert.SerializeObject(newResponce);
             var stringResponce = new StringContent(jsonResponce);
             var responce = _httpClient.PatchAsync(_productArchivePath, stringResponce).Result;

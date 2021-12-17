@@ -9,16 +9,14 @@ namespace ShopHttp.ShopHttpServer.Controllers
 {
     public class ProductArchiveController : IProductArchiveController
     {
-        public ProductArchiveController(IShowcaseController showcaseController, CheckService checkService)
+        public ProductArchiveController(IShowcaseController showcaseController)
         {
             ShowcaseController = showcaseController;
-            CheckService = checkService;
             UnitOfWork = new UnitOfWork();
         }
 
         
         public IShowcaseController ShowcaseController { get; }
-        public CheckService CheckService { get; }
         public IUnitOfWork UnitOfWork { get; }
 
         public void ArchivateProduct(int productId, int showcaseId)
@@ -34,13 +32,11 @@ namespace ShopHttp.ShopHttpServer.Controllers
                     selectProduct.IdInArchive = GetArchiveProductCount();
                     selectProduct.TimeToArchive = DateTime.Now;
                     ShowcaseController.DeleteProductOnShowcase(showcaseId, productId);
-                    //NotifyService.RaiseArchivateProductIsDone();
                 }
             }
             else
             {
                 throw new IdNotFoundException("Id not found");
-                //NotifyService.RaiseSearchProductIdIsNotSuccessful();
             }
         }
 
@@ -48,7 +44,6 @@ namespace ShopHttp.ShopHttpServer.Controllers
         {
             if (GetArchiveProductCount() == 0)
             {
-                //NotifyService.RaiseArchiveIsEmpty();
                 return false;
             }
             else
@@ -62,7 +57,6 @@ namespace ShopHttp.ShopHttpServer.Controllers
             if (CheckArchiveAvailability() && GetArchiveProductCount() >= productId)
             {
                 UnitOfWork.ArchiveRepository.DeleteById(productId);
-                //NotifyService.RaiseDeleteArchiveProductIsDone();
                 var products = from p in UnitOfWork.ArchiveRepository.GetAll()
                                select p;
                 for (int i = 0; i < UnitOfWork.ArchiveRepository.GetCount(); i++)
@@ -73,23 +67,8 @@ namespace ShopHttp.ShopHttpServer.Controllers
             else
             {
                 throw new IdNotFoundException("Id not found");
-                //NotifyService.RaiseSearchProductIdIsNotSuccessful();
             }
         }
-
-        //public void GetArchiveInformation()
-        //{
-        //    if (CheckArchiveAvailability())
-        //    {
-        //        Console.WriteLine("Archive:");
-        //        var archive = from a in UnitOfWork.ArchiveRepository.GetAll()
-        //                      select a;
-        //        foreach (var product in archive)
-        //        {
-        //            Console.WriteLine($"Id: {product.IdInArchive} | Name product: {product.Name} | Volume product: {product.Volume} | Time to create: {product.TimeToCreate} | Time to archive: {product.TimeToArchive}");
-        //        }
-        //    }
-        //}
 
         public int GetArchiveProductCount()
         {
@@ -105,7 +84,6 @@ namespace ShopHttp.ShopHttpServer.Controllers
                 selectShowcase.UnitOfWork.ProductOnShowcaseRepository.Add(selectProduct);
                 selectProduct.IdInShowcase = selectShowcase.GetProductCount();
                 UnitOfWork.ArchiveRepository.DeleteById(productId);
-                //NotifyService.RaiseUnArchivateProductIsDone();
                 var products = from p in UnitOfWork.ArchiveRepository.GetAll()
                                select p;
                 for (int i = 0; i < UnitOfWork.ArchiveRepository.GetCount(); i++)
@@ -116,7 +94,6 @@ namespace ShopHttp.ShopHttpServer.Controllers
             else
             {
                 throw new IdNotFoundException("Id not found");
-                //NotifyService.RaiseSearchProductIdIsNotSuccessful();
             }
         }
 

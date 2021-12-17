@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using ShopHttp.ShopHttpServer.Controllers;
+using ShopHttp.ShopHttpServer.Services;
 using ShopHttp.ShopModels.Models;
 using System;
 using System.Linq;
@@ -27,11 +28,25 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
                     case "GET":
                         GetArchiveInformation(context);
                         break;
-                    case "POST": //Archivate product
-                        ArchivateProduct(context);
+                    case "POST":
+                        try
+                        {
+                            ArchivateProduct(context);
+                        }
+                        catch (IdNotFoundException ex)
+                        {
+                            StreamDataController.SetResponce(ex.Message, context);
+                        }
                         break;
-                    case "PATCH": // Unarchivate product
-                        UnArchivateProduct(context);
+                    case "PATCH":
+                        try
+                        {
+                            UnArchivateProduct(context);
+                        }
+                        catch (IdNotFoundException ex)
+                        {
+                            StreamDataController.SetResponce(ex.Message, context);
+                        }
                         break;
                 }
             }
@@ -74,10 +89,17 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
 
         private void GetArchiveInformation(HttpListenerContext context)
         {
-            var archiveProducts = ProductArchiveController.GetArchiveProducts();
-            var responceBody = JsonConvert.SerializeObject(archiveProducts, Formatting.Indented);
-            StreamDataController.SetResponce(responceBody, context);
-            context.Response.StatusCode = (int)HttpStatusCode.OK;
+            if (ProductArchiveController.GetArchiveProductCount() > 0)
+            {
+                var archiveProducts = ProductArchiveController.GetArchiveProducts();
+                var responceBody = JsonConvert.SerializeObject(archiveProducts, Formatting.Indented);
+                StreamDataController.SetResponce(responceBody, context);
+                context.Response.StatusCode = (int)HttpStatusCode.OK;
+            }
+            else
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.NoContent;
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Text;
 using Newtonsoft.Json;
 using ShopHttp.ShopModels.Models;
 using System.Collections.Generic;
+using System.Net;
 
 namespace ShopHttp.ShopHttpClient.Controllers
 {
@@ -25,7 +26,6 @@ namespace ShopHttp.ShopHttpClient.Controllers
                 Name = productName,
                 Volume = productVolume
             };
-
             var jsonContent = JsonConvert.SerializeObject(newProduct);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "aplication/json");
             var responce = _httpClient.PostAsync(_productPath, stringContent).Result;
@@ -36,8 +36,15 @@ namespace ShopHttp.ShopHttpClient.Controllers
         public void DeleteProduct(int productId)
         {
             var responce = _httpClient.DeleteAsync(_productPath + $"/{productId}").Result;
-            var content = responce.Content.ReadAsStringAsync().Result;
-            Console.WriteLine(content);
+            if (responce.StatusCode == HttpStatusCode.OK)
+            {
+                var content = responce.Content.ReadAsStringAsync().Result;
+                Console.WriteLine(content);
+            }
+            else
+            {
+                Console.WriteLine("Id is not found");
+            }
         }
 
         public void EditProduct(int productId, string productName, double productVolume)
@@ -48,7 +55,6 @@ namespace ShopHttp.ShopHttpClient.Controllers
                 Name = productName,
                 Volume = productVolume
             };
-
             var jsonContent = JsonConvert.SerializeObject(newProduct);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "aplication/json");
             var responce = _httpClient.PutAsync(_productPath, stringContent).Result;
@@ -59,12 +65,10 @@ namespace ShopHttp.ShopHttpClient.Controllers
         public void GetProductInformation()
         {
             var responce = _httpClient.GetAsync(_productPath).Result;
-            
-            if ((int)responce.StatusCode == 200)
+            if (responce.StatusCode == HttpStatusCode.OK)
             {
                 var content = responce.Content.ReadAsStringAsync().Result;
                 var products = JsonConvert.DeserializeObject<List<ProductModel>>(content);
-
                 Console.WriteLine("Products:");
                 foreach (var product in products)
                 {

@@ -51,8 +51,6 @@ namespace ShopHttp.ShopHttpServer.Controllers
         {
             if (GetShowcaseCount() >= showcaseId && ProductController.GetProductCount() >= productId)
             {
-                //if (ProductController.CheckProductAvailability() && CheckShowcaseAvailability())
-                //{
                 if (CheckShowcaseVolumeOverflow(showcaseId, productId))
                 {
                     var selectProduct = ProductController.GetProduct(productId);
@@ -67,7 +65,6 @@ namespace ShopHttp.ShopHttpServer.Controllers
                 {
                     throw new NotEnoughSpaceException("Not enough space on showcase");
                 }
-                //}
             }
             else
             {

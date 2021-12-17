@@ -79,10 +79,6 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
                     StreamDataController.SetResponce(ex.Message, context);
                 }
             }
-            else
-            {
-                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-            }
 
             if (path == ProductOnShowcasePathController.Path && context.Request.HttpMethod == "PUT")
             {
@@ -115,10 +111,6 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
                     StreamDataController.SetResponce(ex.Message, context);
                 }
             }
-            else
-            {
-                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-            }
         }
 
         private void GetShowcaseInfotmation(HttpListenerContext context)
@@ -134,7 +126,6 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
             {
                 context.Response.StatusCode = (int)HttpStatusCode.NoContent;
             }
-            
         }
 
         private void CreateShowcase(HttpListenerContext context)
@@ -165,7 +156,8 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
         {
             var showcaseId = int.Parse(context.Request.Url.Segments.Last());
             ShowcaseController.DeleteShowcase(showcaseId);
-            StreamDataController.SetResponce("Product is delete", context);
+            StreamDataController.SetResponce("Showcase is delete", context);
+            context.Response.StatusCode = (int)HttpStatusCode.OK;
         }
 
         private void PlaceProductOnShowcase(HttpListenerContext context)
