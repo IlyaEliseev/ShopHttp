@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using ShopHttp.ShopHttpServer.Controllers;
-using ShopHttp.ShopHttpServer.Services;
 using ShopHttp.ShopModels.Models;
 using System;
 using System.Linq;
@@ -32,21 +31,12 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
                         CreateProduct(context);
                         break;
                     case "PUT":
-                        try
-                        {
-                            EditProduct(context);
-                        }
-                        catch (IdNotFoundException ex)
-                        {
-                            StreamDataController.SetResponce(ex.Message, context);
-                        }
+                        EditProduct(context);
+                        break;
+                    case "DELETE":
+                        DeleteProduct(context, path);
                         break;
                 }
-            }
-
-            if (path == ProductPathController.FindPath(path) && context.Request.HttpMethod == "DELETE")
-            {
-                DeleteProduct(context);
             }
         }
 
@@ -73,7 +63,7 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
             var productVolume = productPostData.Volume;
             ProductController.CreateProduct(productName, productVolume);
             ProductPathController.AddPath(ProductPathController.Path + $"/{ProductController.GetProductCount()}");
-            StreamDataController.SetResponce("Product is create", context);
+            StreamDataController.SetResponce("Product create", context);
             Console.WriteLine(productPostData);
         }
 
@@ -84,16 +74,37 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
             var productId = productPutData.IdInProductList;
             var productName = productPutData.Name;
             var productVolume = productPutData.Volume;
-            ProductController.EditProduct(productId, productName, productVolume);
-            StreamDataController.SetResponce("Product is edit", context);
-            Console.WriteLine(productPutData);
+            if (ProductController.CheckProductAvailability() && ProductController.GetProductCount() >= productId)
+            {
+                ProductController.EditProduct(productId, productName, productVolume);
+                StreamDataController.SetResponce("Product edit", context);
+                Console.WriteLine(productPutData);
+            }
+            else
+            {
+                StreamDataController.SetResponce("Id not found", context);
+            }
         }
 
-        private void DeleteProduct(HttpListenerContext context) 
+        private void DeleteProduct(HttpListenerContext context, string path) 
         {
-            var productId = int.Parse(context.Request.Url.Segments.Last());
-            ProductController.DeleteProduct(productId);
-            StreamDataController.SetResponce("Product is delete", context);
+            if (path == ProductPathController.FindPath(path))
+            {
+                var productId = int.Parse(context.Request.Url.Segments.Last());
+                if (ProductController.CheckProductAvailability() && ProductController.GetProductCount() > productId)
+                {
+                    ProductController.DeleteProduct(productId);
+                    StreamDataController.SetResponce("Product delete", context);
+                }
+                else
+                {
+                    StreamDataController.SetResponce("Id not found", context);
+                }
+            }
+            else
+            {
+                StreamDataController.SetResponce("Id not found", context);
+            }
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using ShopHttp.ShopHttpServer.Controllers;
 using ShopHttp.ShopHttpServer.Models;
-using ShopHttp.ShopHttpServer.Services;
 using ShopHttp.ShopModels.Models;
 using System;
 using System.Linq;
@@ -11,13 +10,15 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
 {
     public class ShowcaseHttpController : IHttpController
     {
-        public ShowcaseHttpController(IPathController showcasePathController, IPathController productObShowcasePathController, IShowcaseController showcaseController)
+        public ShowcaseHttpController(IPathController showcasePathController, IPathController productObShowcasePathController, IProductController productController, IShowcaseController showcaseController)
         {
+            ProductController = productController;
             ShowcasePathController = showcasePathController;
             ProductOnShowcasePathController = productObShowcasePathController;
             ShowcaseController = showcaseController;
         }
 
+        public IProductController ProductController { get; set; }
         public IShowcaseController ShowcaseController { get; set; }
         public IPathController ShowcasePathController { get; set; }
         public IPathController ProductOnShowcasePathController { get; set; }
@@ -35,81 +36,25 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
                         CreateShowcase(context);
                         break;
                     case "PUT":
-                        try
-                        {
-                            EditeShowcsae(context);
-                        }
-                        catch (IdNotFoundException ex)
-                        {
-                            StreamDataController.SetResponce(ex.Message, context);
-                        }
-                        catch (NotEmptyCollectionException ex)
-                        {
-                            StreamDataController.SetResponce(ex.Message, context);
-                        }
-
+                        EditeShowcsae(context);
                         break;
                     case "PATCH":
-                        try
-                        {
-                            PlaceProductOnShowcase(context);
-                        }
-                        catch (IdNotFoundException ex)
-                        {
-
-                            StreamDataController.SetResponce(ex.Message, context);
-                        }
-                        catch (NotEnoughSpaceException ex)
-                        {
-                            StreamDataController.SetResponce(ex.Message, context);
-                        }
-
+                        PlaceProductOnShowcase(context);
                         break;
-                }
-            }
-
-            if (path == ShowcasePathController.FindPath(path) && context.Request.HttpMethod == "DELETE")
-            {
-                try
-                {
-                    DeleteShowcase(context);
-                }
-                catch (NotEmptyCollectionException ex)
-                {
-                    StreamDataController.SetResponce(ex.Message, context);
+                    case "DELETE":
+                        DeleteShowcase(context, path);
+                        break;
                 }
             }
 
             if (path == ProductOnShowcasePathController.Path && context.Request.HttpMethod == "PUT")
             {
-                try
-                {
-                    EditeProductOnShowcase(context);
-                }
-                catch (IdNotFoundException ex)
-                {
-                    StreamDataController.SetResponce(ex.Message, context);
-                }
-                catch (ProductNotFoundException ex)
-                {
-                    StreamDataController.SetResponce(ex.Message, context);
-                }
-                catch (NotEnoughSpaceException ex)
-                {
-                    StreamDataController.SetResponce(ex.Message, context);
-                }
+                EditeProductOnShowcase(context);
             }
-
-            if (path == ProductOnShowcasePathController.FindPath(path) && context.Request.HttpMethod == "DELETE")
+            
+            if (context.Request.HttpMethod == "DELETE")
             {
-                try
-                {
-                    DeleteProductOnShowcase(context);
-                }
-                catch (IdNotFoundException ex)
-                {
-                    StreamDataController.SetResponce(ex.Message, context);
-                }
+                DeleteProductOnShowcase(context, path);
             }
         }
 
@@ -136,7 +81,7 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
             var showcaseVolume = showcasePostData.Volume;
             ShowcaseController.CreateShowcase(showcaseName, showcaseVolume);
             ShowcasePathController.AddPath(ShowcasePathController.Path + $"/{ShowcaseController.GetShowcaseCount()}");
-            StreamDataController.SetResponce("Showcase is create", context);
+            StreamDataController.SetResponce("Showcase create", context);
             Console.WriteLine(showcasePostData);
         }
 
@@ -147,17 +92,52 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
             var showcaseId = showcasePutData.Id;
             var showcaseName = showcasePutData.Name;
             var showcaseVolume = showcasePutData.Volume;
-            ShowcaseController.EditeShowcase(showcaseId, showcaseName, showcaseVolume);
-            StreamDataController.SetResponce("Showcase is edit", context);
-            Console.WriteLine(showcasePutData);
+            if (ShowcaseController.CheckShowcaseAvailability() && ShowcaseController.GetShowcaseCount() >= showcaseId)
+            {
+                if (ShowcaseController.GetProductCountOnShowcase(showcaseId) == 0)
+                {
+                    ShowcaseController.EditeShowcase(showcaseId, showcaseName, showcaseVolume);
+                    StreamDataController.SetResponce("Showcase edit", context);
+                    Console.WriteLine(showcasePutData);
+                }
+                else
+                {
+                    StreamDataController.SetResponce("Showcase not empty. You can only delete empty showcases", context);
+                }
+            }
+            else
+            {
+                StreamDataController.SetResponce("Id not found", context);
+            }
         }
 
-        private void DeleteShowcase(HttpListenerContext context)
+        private void DeleteShowcase(HttpListenerContext context, string path)
         {
-            var showcaseId = int.Parse(context.Request.Url.Segments.Last());
-            ShowcaseController.DeleteShowcase(showcaseId);
-            StreamDataController.SetResponce("Showcase is delete", context);
-            context.Response.StatusCode = (int)HttpStatusCode.OK;
+            if (path == ShowcasePathController.FindPath(path))
+            {
+                var showcaseId = int.Parse(context.Request.Url.Segments.Last());
+                if (ShowcaseController.CheckShowcaseAvailability() && ShowcaseController.GetShowcaseCount() >= showcaseId)
+                {
+                    if (ShowcaseController.CheckShowcaseCount(showcaseId))
+                    {
+                        ShowcaseController.DeleteShowcase(showcaseId);
+                        StreamDataController.SetResponce("Showcase delete", context);
+                        context.Response.StatusCode = (int)HttpStatusCode.OK;
+                    }
+                    else
+                    {
+                        StreamDataController.SetResponce("Showcase not empty. You can only delete empty showcases", context);
+                    }
+                }
+                else
+                {
+                    StreamDataController.SetResponce("Id not found", context);
+                }
+            }
+            else
+            {
+                StreamDataController.SetResponce("Id not found", context);
+            }
         }
 
         private void PlaceProductOnShowcase(HttpListenerContext context)
@@ -166,10 +146,24 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
             context.Response.StatusCode = (int)HttpStatusCode.OK;
             var showcaseId = showcasePatchData.ShowcaseId;
             var productId = showcasePatchData.ProductId;
-            ShowcaseController.PlaceProductOnShowcase(productId, showcaseId);
-            ProductOnShowcasePathController.AddPath(ShowcasePathController.Path + $"/{showcaseId}" + $"/product/{ShowcaseController.GetProductCountOnShowcase(showcaseId)}");
-            StreamDataController.SetResponce("Product place on showcase", context);
-            Console.WriteLine(showcasePatchData);
+            if (ShowcaseController.GetShowcaseCount() >= showcaseId && ProductController.GetProductCount() >= productId)
+            {
+                if (ShowcaseController.CheckShowcaseVolumeOverflow(showcaseId, productId))
+                {
+                    ShowcaseController.PlaceProductOnShowcase(productId, showcaseId);
+                    ProductOnShowcasePathController.AddPath(ShowcasePathController.Path + $"/{showcaseId}" + $"/product/{ShowcaseController.GetProductCountOnShowcase(showcaseId)}");
+                    StreamDataController.SetResponce("Product place on showcase", context);
+                    Console.WriteLine(showcasePatchData);
+                }
+                else
+                {
+                    StreamDataController.SetResponce("Not enough space on showcase", context);
+                }
+            }
+            else
+            {
+                StreamDataController.SetResponce("Id not found", context);
+            }
         }
 
         private void EditeProductOnShowcase(HttpListenerContext context)
@@ -180,18 +174,55 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
             var productId = productOnShowcasePutData.ProductInShowcaseId;
             var productName = productOnShowcasePutData.ProductName;
             var productVolume = productOnShowcasePutData.ProductVolume;
-            ShowcaseController.EditeProductOnShowcase(productId, showcaseId, productName, productVolume);
-            StreamDataController.SetResponce("Product on showcase is edit", context);
-            Console.WriteLine(productOnShowcasePutData);
+            if (ShowcaseController.CheckShowcaseAvailability() && ShowcaseController.GetShowcaseCount() >= showcaseId)
+            {
+                if (ShowcaseController.CheckProductOnCurrentShowcase(showcaseId))
+                {
+                    if (productVolume <= ShowcaseController.GetShowcaseFreeSpace(showcaseId))
+                    {
+                        ShowcaseController.EditeProductOnShowcase(productId, showcaseId, productName, productVolume);
+                        StreamDataController.SetResponce("Product on showcase edit", context);
+                        Console.WriteLine(productOnShowcasePutData);
+                    }
+                    else
+                    {
+                        StreamDataController.SetResponce("Not enough space on showcase", context);
+                    }
+                }
+                else
+                {
+                    StreamDataController.SetResponce("That product not found", context);
+                }
+            }
+            else
+            {
+                StreamDataController.SetResponce("Id not found", context);
+            }
         }
 
-        private void DeleteProductOnShowcase(HttpListenerContext context)
+        private void DeleteProductOnShowcase(HttpListenerContext context, string path)
         {
-            string stringPAth = context.Request.Url.Segments[3];
-            var showcaseId = int.Parse(stringPAth.TrimEnd('/'));
-            var productId = int.Parse(context.Request.Url.Segments.Last());
-            ShowcaseController.DeleteProductOnShowcase(showcaseId, productId);
-            StreamDataController.SetResponce("Product is delete", context);
+            if (path == ProductOnShowcasePathController.FindPath(path))
+            {
+                string stringPAth = context.Request.Url.Segments[3];
+                var showcaseId = int.Parse(stringPAth.TrimEnd('/'));
+                var productId = int.Parse(context.Request.Url.Segments.Last());
+                if (ShowcaseController.CheckShowcaseAvailability() && ShowcaseController.GetShowcaseCount() >= showcaseId &&
+                                                                    ShowcaseController.CheckProductOnCurrentShowcase(showcaseId))
+                {
+
+                    ShowcaseController.DeleteProductOnShowcase(showcaseId, productId);
+                    StreamDataController.SetResponce("Product delete", context);
+                }
+                else
+                {
+                    StreamDataController.SetResponce("Id not found", context);
+                }
+            }
+            else
+            {
+                StreamDataController.SetResponce("Id not found", context);
+            }
         }
     }
 }

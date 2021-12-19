@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using ShopHttp.ShopHttpServer.HttpResponceControllers;
 
@@ -24,16 +25,25 @@ namespace ShopHttp.ShopHttpServer
         {
             _httpListener.Start();
             Console.WriteLine("Server started");
-
-            while (true)
+            try
             {
-                var context = _httpListener.GetContext();
-                var path = context.Request.Url.PathAndQuery;
-
-                ProductHttpController.StartController(context, path);
-                ShowcasetHttpController.StartController(context, path);
-                ProductArchiveHttpController.StartController(context, path);
-                context.Response.Close();
+                while (true)
+                {
+                    var context = _httpListener.GetContext();
+                    var path = context.Request.Url.PathAndQuery;
+                    ProductHttpController.StartController(context, path);
+                    ShowcasetHttpController.StartController(context, path);
+                    ProductArchiveHttpController.StartController(context, path);
+                    context.Response.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                File.AppendAllText("serverLogs.log", ex.ToString());
+            }
+            finally
+            {
+                _httpListener.Stop();
             }
         }
     }

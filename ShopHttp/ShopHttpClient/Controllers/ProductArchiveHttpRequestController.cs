@@ -42,7 +42,7 @@ namespace ShopHttp.ShopHttpClient.Controllers
             }
             else
             {
-                Console.WriteLine("Id is not found");
+                Console.WriteLine("Id not found");
             }
         }
 
@@ -61,9 +61,8 @@ namespace ShopHttp.ShopHttpClient.Controllers
             }
             else
             {
-                Console.WriteLine("Archive is empty");
+                Console.WriteLine("Archive empty");
             }
-            
         }
 
         public void UnArchivateProduct(int productId)

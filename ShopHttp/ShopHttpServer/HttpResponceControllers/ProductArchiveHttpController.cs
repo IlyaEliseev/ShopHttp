@@ -10,13 +10,15 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
 {
     internal class ProductArchiveHttpController : IHttpController
     {
-        public ProductArchiveHttpController(IProductArchiveController productArchiveController, IPathController productArchivePathController)
+        public ProductArchiveHttpController(IProductArchiveController productArchiveController, IPathController productArchivePathController, IShowcaseController showcaseController)
         {
             ProductArchiveController = productArchiveController;
             ProductArchivePathController = productArchivePathController;
+            ShowcaseController = showcaseController;
         }
 
         public IProductArchiveController ProductArchiveController { get; set; }
+        public IShowcaseController ShowcaseController { get; set; }
         public IPathController ProductArchivePathController { get; set; }
 
         public void StartController(HttpListenerContext context, string path)
@@ -29,34 +31,17 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
                         GetArchiveInformation(context);
                         break;
                     case "POST":
-                        try
-                        {
-                            ArchivateProduct(context);
-                        }
-                        catch (IdNotFoundException ex)
-                        {
-                            StreamDataController.SetResponce(ex.Message, context);
-                        }
+                        ArchivateProduct(context);
                         break;
                     case "PATCH":
-                        try
-                        {
-                            UnArchivateProduct(context);
-                        }
-                        catch (IdNotFoundException ex)
-                        {
-                            StreamDataController.SetResponce(ex.Message, context);
-                        }
+                        UnArchivateProduct(context);
+                        break;
+                    case "DELETE":
+                        DeleteArchiveProduct(context, path);
                         break;
                 }
             }
-
-            if (path == ProductArchivePathController.FindPath(path) && context.Request.HttpMethod == "DELETE")
-            {
-                DeleteArchiveProduct(context);
-            }
         }
-
 
         private void ArchivateProduct(HttpListenerContext context)
         {
@@ -64,10 +49,18 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
             context.Response.StatusCode = (int)HttpStatusCode.OK;
             var productId = archivePostData.ProductInShowcaseId;
             var showcaseId = archivePostData.ShowcaseId;
-            ProductArchiveController.ArchivateProduct(productId, showcaseId);
-            ProductArchivePathController.AddPath(ProductArchivePathController.Path + $"/{ProductArchiveController.GetArchiveProductCount()}");
-            StreamDataController.SetResponce("Product is archivate", context);
-            Console.WriteLine(archivePostData);
+            if (ShowcaseController.CheckShowcaseAvailability() && ShowcaseController.GetShowcaseCount() >= showcaseId
+                && ShowcaseController.GetProductCountOnShowcase(showcaseId) >= productId)
+            {
+                ProductArchiveController.ArchivateProduct(productId, showcaseId);
+                ProductArchivePathController.AddPath(ProductArchivePathController.Path + $"/{ProductArchiveController.GetArchiveProductCount()}");
+                StreamDataController.SetResponce("Product archivate", context);
+                Console.WriteLine(archivePostData);
+            }
+            else
+            {
+                StreamDataController.SetResponce("Id not found", context);
+            }
         }
 
         private void UnArchivateProduct(HttpListenerContext context)
@@ -75,16 +68,37 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
             var archivePatchData = StreamDataController.GetRequestDataBody<HttpResponceModel>(context);
             context.Response.StatusCode = (int)HttpStatusCode.OK;
             var productId = archivePatchData.ProductInArchiveId;
-            ProductArchiveController.UnArchivateProduct(productId);
-            StreamDataController.SetResponce("Product is unarchivate", context);
-            Console.WriteLine(archivePatchData);
+            if (ProductArchiveController.CheckArchiveAvailability() && ProductArchiveController.GetArchiveProductCount() >= productId)
+            {
+                ProductArchiveController.UnArchivateProduct(productId);
+                StreamDataController.SetResponce("Product unarchivate", context);
+                Console.WriteLine(archivePatchData);
+            }
+            else
+            {
+                StreamDataController.SetResponce("Id not found", context);
+            }
         }
 
-        private void DeleteArchiveProduct(HttpListenerContext context)
+        private void DeleteArchiveProduct(HttpListenerContext context, string path)
         {
-            var productId = int.Parse(context.Request.Url.Segments.Last());
-            ProductArchiveController.DeleteArchiveProduct(productId);
-            StreamDataController.SetResponce("Product is delete", context);
+            if (path == ProductArchivePathController.FindPath(path))
+            {
+                var productId = int.Parse(context.Request.Url.Segments.Last());
+                if (ProductArchiveController.CheckArchiveAvailability() && ProductArchiveController.GetArchiveProductCount() >= productId)
+                {
+                    ProductArchiveController.DeleteArchiveProduct(productId);
+                    StreamDataController.SetResponce("Product delete", context);
+                }
+                else
+                {
+                    StreamDataController.SetResponce("Id not found", context);
+                }
+            }
+            else
+            {
+                StreamDataController.SetResponce("Id not found", context);
+            }
         }
 
         private void GetArchiveInformation(HttpListenerContext context)

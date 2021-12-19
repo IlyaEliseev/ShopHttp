@@ -21,53 +21,53 @@ namespace ShopHttp.ShopHttpClient.Controllers
 
         public void CreateProduct(string productName, double productVolume)
         {
-            var newProduct = new ProductModel()
+            var productModel = new ProductModel()
             {
                 Name = productName,
                 Volume = productVolume
             };
-            var jsonContent = JsonConvert.SerializeObject(newProduct);
+            var jsonContent = JsonConvert.SerializeObject(productModel);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "aplication/json");
-            var responce = _httpClient.PostAsync(_productPath, stringContent).Result;
-            var content = responce.Content.ReadAsStringAsync().Result;
+            var response = _httpClient.PostAsync(_productPath, stringContent).Result;
+            var content = response.Content.ReadAsStringAsync().Result;
             Console.WriteLine(content);
         }
 
         public void DeleteProduct(int productId)
         {
-            var responce = _httpClient.DeleteAsync(_productPath + $"/{productId}").Result;
-            if (responce.StatusCode == HttpStatusCode.OK)
+            var response = _httpClient.DeleteAsync(_productPath + $"/{productId}").Result;
+            if (response.StatusCode == HttpStatusCode.OK)
             {
-                var content = responce.Content.ReadAsStringAsync().Result;
+                var content = response.Content.ReadAsStringAsync().Result;
                 Console.WriteLine(content);
             }
             else
             {
-                Console.WriteLine("Id is not found");
+                Console.WriteLine("Id not found");
             }
         }
 
         public void EditProduct(int productId, string productName, double productVolume)
         {
-            var newProduct = new ProductModel()
+            var productModel = new ProductModel()
             {
                 IdInProductList = productId,
                 Name = productName,
                 Volume = productVolume
             };
-            var jsonContent = JsonConvert.SerializeObject(newProduct);
+            var jsonContent = JsonConvert.SerializeObject(productModel);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "aplication/json");
-            var responce = _httpClient.PutAsync(_productPath, stringContent).Result;
-            var content = responce.Content.ReadAsStringAsync().Result;
+            var response = _httpClient.PutAsync(_productPath, stringContent).Result;
+            var content = response.Content.ReadAsStringAsync().Result;
             Console.WriteLine(content);
         }
 
         public void GetProductInformation()
         {
-            var responce = _httpClient.GetAsync(_productPath).Result;
-            if (responce.StatusCode == HttpStatusCode.OK)
+            var response = _httpClient.GetAsync(_productPath).Result;
+            if (response.StatusCode == HttpStatusCode.OK)
             {
-                var content = responce.Content.ReadAsStringAsync().Result;
+                var content = response.Content.ReadAsStringAsync().Result;
                 var products = JsonConvert.DeserializeObject<List<ProductModel>>(content);
                 Console.WriteLine("Products:");
                 foreach (var product in products)
@@ -77,7 +77,7 @@ namespace ShopHttp.ShopHttpClient.Controllers
             }
             else
             {
-                Console.WriteLine("Product list is empty");
+                Console.WriteLine("Product list empty");
             }
         }
     }

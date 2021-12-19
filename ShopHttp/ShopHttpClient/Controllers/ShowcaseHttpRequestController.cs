@@ -37,7 +37,7 @@ namespace ShopHttp.ShopHttpClient.Controllers
 
         public void DeleteProductOnShowcase(int showcaseId, int productId)
         {
-            var responce = _httpClient.DeleteAsync($"app/showcase/{showcaseId}/product/{productId}").Result;
+            var responce = _httpClient.DeleteAsync(_showcasePath + $"/{showcaseId}/product/{productId}").Result;
             if (responce.StatusCode == HttpStatusCode.OK)
             {
                 var content = responce.Content.ReadAsStringAsync().Result;
@@ -45,7 +45,7 @@ namespace ShopHttp.ShopHttpClient.Controllers
             }
             else
             {
-                Console.WriteLine("Id is not found");
+                Console.WriteLine("Id not found");
             }
         }
 
@@ -59,7 +59,7 @@ namespace ShopHttp.ShopHttpClient.Controllers
             }
             else
             {
-                Console.WriteLine("Id is not found");
+                Console.WriteLine("Id not found");
             }
         }
 
@@ -113,7 +113,7 @@ namespace ShopHttp.ShopHttpClient.Controllers
             }
             else
             {
-                Console.WriteLine("Showcases is empty");
+                Console.WriteLine("Showcases empty");
             }
         }
 

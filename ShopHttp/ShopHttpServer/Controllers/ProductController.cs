@@ -25,16 +25,16 @@ namespace ShopHttp.ShopHttpServer.Controllers
         
         public void EditProduct(int productId, string productName, double productVolume)
         {
-            if (CheckProductAvailability() && UnitOfWork.ProductRepository.GetCount() >= productId)
-            {
+            //if (CheckProductAvailability() && UnitOfWork.ProductRepository.GetCount() >= productId)
+            //{
                 var selectProduct = UnitOfWork.ProductRepository.GetById(productId);
                 selectProduct.Name = productName;
                 selectProduct.Volume = productVolume;
-            }
-            else
-            {
-                throw new IdNotFoundException("Id not found");
-            }
+            //}
+            //else
+            //{
+                //throw new IdNotFoundException("Id not found");
+            //}
         }
         
         public void DeleteProduct(int productId)
