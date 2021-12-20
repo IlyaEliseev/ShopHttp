@@ -13,7 +13,7 @@ namespace ShopHttp.ShopHttpClient.Services
                 bool succses = int.TryParse(id, out verifiableId);
                 if (succses == false || verifiableId == 0)
                 {
-                    Messages.SetRedColor("Id not found!");
+                    SetRedColor("Id not found!");
                     Console.WriteLine("Input Id: ");
                     id = Console.ReadLine();
                 }
@@ -36,7 +36,7 @@ namespace ShopHttp.ShopHttpClient.Services
                 
                 if (succses == false)
                 {
-                    Messages.SetRedColor("Volume is uncorrect!");
+                    SetRedColor("Volume is uncorrect!");
                     Console.WriteLine("Input volume: ");
                     volume = Console.ReadLine();
                 }
@@ -55,7 +55,7 @@ namespace ShopHttp.ShopHttpClient.Services
             {
                 if (string.IsNullOrWhiteSpace(name))
                 {
-                    Messages.SetRedColor("Name is uncorrect!");
+                    SetRedColor("Name is uncorrect!");
                     Console.WriteLine("Input name:");
                     name = Console.ReadLine();
                 }
@@ -65,6 +65,13 @@ namespace ShopHttp.ShopHttpClient.Services
                 }
             } while (isContinue);
             return name;
+        }
+
+        public void SetRedColor(string messege)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"{messege}");
+            Console.ResetColor();
         }
     }
 }

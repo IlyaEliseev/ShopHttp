@@ -1,6 +1,6 @@
-﻿namespace ShopHttp.ShopHttpServer.Models
+﻿namespace ShopHttp.ShopModels.Models
 {
-    public class HttpResponce
+    public class HttpModel
     {
         public int ProductId { get; set; }
         public int ShowcaseId { get; set; }

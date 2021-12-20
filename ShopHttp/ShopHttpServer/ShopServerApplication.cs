@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
-using ShopHttp.ShopHttpServer.HttpResponceControllers;
+using ShopHttp.ShopHttpServer.HttpControllers;
 
 namespace ShopHttp.ShopHttpServer
 {

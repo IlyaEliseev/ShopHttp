@@ -1,7 +1,7 @@
 ﻿using ShopHttp.ShopHttpServer.Controllers;
 using System.Collections.Generic;
 
-namespace ShopHttp.ShopHttpServer.HttpResponceControllers
+namespace ShopHttp.ShopHttpServer.HttpPathControllers
 {
     public class ProductPathController : IPathController
     {

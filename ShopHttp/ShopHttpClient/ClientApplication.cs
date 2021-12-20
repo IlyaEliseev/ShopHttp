@@ -7,8 +7,9 @@ namespace ShopHttp.ShopHttpClient
 {
     public class ClientApplication
     {
-        public ClientApplication(IProductHttpRequestController productHttpController, IProductArchiveHttpRequestController productArchiveHttpController, IShowcaseHttpRequestController showcaseHttpController,
-                                  CheckService checkService)
+        public ClientApplication(IProductHttpRequestController productHttpController, IProductArchiveHttpRequestController productArchiveHttpController, 
+            IShowcaseHttpRequestController showcaseHttpController, CheckService checkService)
+
         {
             ProductHttpController = productHttpController;
             ProductArchiveHttpController = productArchiveHttpController;
@@ -34,7 +35,7 @@ namespace ShopHttp.ShopHttpClient
                 bool succses = int.TryParse(input, out int command);
                 if (succses == false || command > Enum.GetNames(typeof(InputCommands)).Length)
                 {
-                    Messages.SetRedColor("Wrong command!");
+                    CheckService.SetRedColor("Wrong command!");
                 }
 
                 else

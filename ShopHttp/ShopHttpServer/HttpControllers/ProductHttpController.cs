@@ -1,11 +1,12 @@
 ﻿using Newtonsoft.Json;
 using ShopHttp.ShopHttpServer.Controllers;
+using ShopHttp.ShopHttpServer.HttpPathControllers;
 using ShopHttp.ShopModels.Models;
 using System;
 using System.Linq;
 using System.Net;
 
-namespace ShopHttp.ShopHttpServer.HttpResponceControllers
+namespace ShopHttp.ShopHttpServer.HttpControllers
 {
     public class ProductHttpController : IHttpController
     {

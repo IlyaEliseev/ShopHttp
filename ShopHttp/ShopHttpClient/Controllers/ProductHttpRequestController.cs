@@ -21,12 +21,12 @@ namespace ShopHttp.ShopHttpClient.Controllers
 
         public void CreateProduct(string productName, double productVolume)
         {
-            var productModel = new ProductModel()
+            var requestModel = new ProductModel()
             {
                 Name = productName,
                 Volume = productVolume
             };
-            var jsonContent = JsonConvert.SerializeObject(productModel);
+            var jsonContent = JsonConvert.SerializeObject(requestModel);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "aplication/json");
             var response = _httpClient.PostAsync(_productPath, stringContent).Result;
             var content = response.Content.ReadAsStringAsync().Result;
@@ -36,26 +36,19 @@ namespace ShopHttp.ShopHttpClient.Controllers
         public void DeleteProduct(int productId)
         {
             var response = _httpClient.DeleteAsync(_productPath + $"/{productId}").Result;
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                var content = response.Content.ReadAsStringAsync().Result;
-                Console.WriteLine(content);
-            }
-            else
-            {
-                Console.WriteLine("Id not found");
-            }
+            var content = response.Content.ReadAsStringAsync().Result;
+            Console.WriteLine(content);
         }
 
         public void EditProduct(int productId, string productName, double productVolume)
         {
-            var productModel = new ProductModel()
+            var requestModel = new ProductModel()
             {
                 IdInProductList = productId,
                 Name = productName,
                 Volume = productVolume
             };
-            var jsonContent = JsonConvert.SerializeObject(productModel);
+            var jsonContent = JsonConvert.SerializeObject(requestModel);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "aplication/json");
             var response = _httpClient.PutAsync(_productPath, stringContent).Result;
             var content = response.Content.ReadAsStringAsync().Result;

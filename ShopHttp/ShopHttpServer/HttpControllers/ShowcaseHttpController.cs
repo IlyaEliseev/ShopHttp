@@ -1,12 +1,13 @@
 ﻿using Newtonsoft.Json;
 using ShopHttp.ShopHttpServer.Controllers;
+using ShopHttp.ShopHttpServer.HttpPathControllers;
 using ShopHttp.ShopHttpServer.Models;
 using ShopHttp.ShopModels.Models;
 using System;
 using System.Linq;
 using System.Net;
 
-namespace ShopHttp.ShopHttpServer.HttpResponceControllers
+namespace ShopHttp.ShopHttpServer.HttpControllers
 {
     public class ShowcaseHttpController : IHttpController
     {
@@ -142,7 +143,7 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
 
         private void PlaceProductOnShowcase(HttpListenerContext context)
         {
-            var showcasePatchData = StreamDataController.GetRequestDataBody<HttpResponceModel>(context);
+            var showcasePatchData = StreamDataController.GetRequestDataBody<HttpModel>(context);
             context.Response.StatusCode = (int)HttpStatusCode.OK;
             var showcaseId = showcasePatchData.ShowcaseId;
             var productId = showcasePatchData.ProductId;
@@ -168,7 +169,7 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
 
         private void EditeProductOnShowcase(HttpListenerContext context)
         {
-            var productOnShowcasePutData = StreamDataController.GetRequestDataBody<HttpResponceModel>(context);
+            var productOnShowcasePutData = StreamDataController.GetRequestDataBody<HttpModel>(context);
             context.Response.StatusCode = (int)HttpStatusCode.OK;
             var showcaseId = productOnShowcasePutData.ShowcaseId;
             var productId = productOnShowcasePutData.ProductInShowcaseId;

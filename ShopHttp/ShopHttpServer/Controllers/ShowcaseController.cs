@@ -7,7 +7,6 @@ namespace ShopHttp.ShopHttpServer.Controllers
 {
     public class ShowcaseController : IShowcaseController
     {
-
         public ShowcaseController(IProductController productController)
         {
             ProductController = productController;

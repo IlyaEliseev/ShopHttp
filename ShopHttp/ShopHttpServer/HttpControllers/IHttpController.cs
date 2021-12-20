@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace ShopHttp.ShopHttpServer.HttpResponceControllers
+namespace ShopHttp.ShopHttpServer.HttpControllers
 {
     public interface IHttpController
     {

@@ -1,5 +1,4 @@
-﻿using ShopHttp.ShopHttpServer.Services;
-using ShopHttp.ShopHttpServer.DAL;
+﻿using ShopHttp.ShopHttpServer.DAL;
 using ShopHttp.ShopHttpServer.Models;
 using System.Linq;
 using System.Collections.Generic;
@@ -14,7 +13,6 @@ namespace ShopHttp.ShopHttpServer.Controllers
         }
 
         public IUnitOfWork UnitOfWork { get; }
-        public CheckService CheckService { get; }
 
         public void CreateProduct(string productName, double productVolume)
         {
@@ -25,16 +23,9 @@ namespace ShopHttp.ShopHttpServer.Controllers
         
         public void EditProduct(int productId, string productName, double productVolume)
         {
-            //if (CheckProductAvailability() && UnitOfWork.ProductRepository.GetCount() >= productId)
-            //{
-                var selectProduct = UnitOfWork.ProductRepository.GetById(productId);
-                selectProduct.Name = productName;
-                selectProduct.Volume = productVolume;
-            //}
-            //else
-            //{
-                //throw new IdNotFoundException("Id not found");
-            //}
+            var selectProduct = UnitOfWork.ProductRepository.GetById(productId);
+            selectProduct.Name = productName;
+            selectProduct.Volume = productVolume;
         }
         
         public void DeleteProduct(int productId)

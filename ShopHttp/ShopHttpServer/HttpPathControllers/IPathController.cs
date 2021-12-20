@@ -1,4 +1,4 @@
-﻿namespace ShopHttp.ShopHttpServer.HttpResponceControllers
+﻿namespace ShopHttp.ShopHttpServer.HttpPathControllers
 {
     public interface IPathController
     {

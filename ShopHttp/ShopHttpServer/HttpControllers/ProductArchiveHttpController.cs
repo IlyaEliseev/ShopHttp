@@ -1,12 +1,12 @@
 ﻿using Newtonsoft.Json;
 using ShopHttp.ShopHttpServer.Controllers;
-using ShopHttp.ShopHttpServer.Services;
+using ShopHttp.ShopHttpServer.HttpPathControllers;
 using ShopHttp.ShopModels.Models;
 using System;
 using System.Linq;
 using System.Net;
 
-namespace ShopHttp.ShopHttpServer.HttpResponceControllers
+namespace ShopHttp.ShopHttpServer.HttpControllers
 {
     internal class ProductArchiveHttpController : IHttpController
     {
@@ -45,7 +45,7 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
 
         private void ArchivateProduct(HttpListenerContext context)
         {
-            var archivePostData = StreamDataController.GetRequestDataBody<HttpResponceModel>(context);
+            var archivePostData = StreamDataController.GetRequestDataBody<HttpModel>(context);
             context.Response.StatusCode = (int)HttpStatusCode.OK;
             var productId = archivePostData.ProductInShowcaseId;
             var showcaseId = archivePostData.ShowcaseId;
@@ -65,7 +65,7 @@ namespace ShopHttp.ShopHttpServer.HttpResponceControllers
 
         private void UnArchivateProduct(HttpListenerContext context)
         {
-            var archivePatchData = StreamDataController.GetRequestDataBody<HttpResponceModel>(context);
+            var archivePatchData = StreamDataController.GetRequestDataBody<HttpModel>(context);
             context.Response.StatusCode = (int)HttpStatusCode.OK;
             var productId = archivePatchData.ProductInArchiveId;
             if (ProductArchiveController.CheckArchiveAvailability() && ProductArchiveController.GetArchiveProductCount() >= productId)

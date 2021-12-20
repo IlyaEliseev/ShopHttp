@@ -23,83 +23,69 @@ namespace ShopHttp.ShopHttpClient.Controllers
 
         public void CreateShowcase(string nameShowcase, double volumeShowcase)
         {
-            var newResponce = new Showcase()
+            var requestModel = new Showcase()
             {
                 Name = nameShowcase,
                 Volume = volumeShowcase
             };
-            var jsonResponce = JsonConvert.SerializeObject(newResponce);
-            var stringResponce = new StringContent(jsonResponce, Encoding.UTF8, "application/json");
-            var responce = _httpClient.PostAsync(_showcasePath, stringResponce).Result;
-            var content = responce.Content.ReadAsStringAsync().Result;
+            var jsonContent = JsonConvert.SerializeObject(requestModel);
+            var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            var response = _httpClient.PostAsync(_showcasePath, stringContent).Result;
+            var content = response.Content.ReadAsStringAsync().Result;
             Console.WriteLine(content);
         }
 
         public void DeleteProductOnShowcase(int showcaseId, int productId)
         {
-            var responce = _httpClient.DeleteAsync(_showcasePath + $"/{showcaseId}/product/{productId}").Result;
-            if (responce.StatusCode == HttpStatusCode.OK)
-            {
-                var content = responce.Content.ReadAsStringAsync().Result;
-                Console.WriteLine(content);
-            }
-            else
-            {
-                Console.WriteLine("Id not found");
-            }
+            var response = _httpClient.DeleteAsync(_showcasePath + $"/{showcaseId}/product/{productId}").Result;
+            var content = response.Content.ReadAsStringAsync().Result;
+            Console.WriteLine(content);
         }
 
         public void DeleteShowcase(int showcaseId)
         {
-            var responce = _httpClient.DeleteAsync(_showcasePath + $"/{showcaseId}").Result;
-            if (responce.StatusCode == HttpStatusCode.OK)
-            {
-                var content = responce.Content.ReadAsStringAsync().Result;
-                Console.WriteLine(content);
-            }
-            else
-            {
-                Console.WriteLine("Id not found");
-            }
+            var response = _httpClient.DeleteAsync(_showcasePath + $"/{showcaseId}").Result;
+            var content = response.Content.ReadAsStringAsync().Result;
+            Console.WriteLine(content);
         }
 
         public void EditeProductOnShowcase(int productId, int showcaseId, string productName, double productVolume)
         {
-            var newResponce = new HttpResponceModel()
+            var requestModel = new HttpModel()
             {
                 ProductInShowcaseId = productId,
                 ShowcaseId = showcaseId,
                 ProductName = productName,
                 ProductVolume = productVolume
             };
-            var jsonResponce = JsonConvert.SerializeObject(newResponce);
-            var stringResponce = new StringContent(jsonResponce);
-            var responce = _httpClient.PutAsync(_productOnShowcasePath, stringResponce).Result;
-            var content = responce.Content.ReadAsStringAsync().Result;
+            var jsonContent = JsonConvert.SerializeObject(requestModel);
+            var stringContent = new StringContent(jsonContent);
+            var response = _httpClient.PutAsync(_productOnShowcasePath, stringContent).Result;
+            var content = response.Content.ReadAsStringAsync().Result;
             Console.WriteLine(content);
         }
 
         public void EditeShowcase(int showcaseId, string showcaseName, double showcaseVolume)
         {
-            var newResponce = new Showcase()
+            var requestModel = new Showcase()
             {
                 Id = showcaseId,
                 Name = showcaseName,
                 Volume = showcaseVolume
             };
-            var jsonResponce = JsonConvert.SerializeObject(newResponce);
-            var stringResponce = new StringContent(jsonResponce);
-            var responce = _httpClient.PutAsync(_showcasePath, stringResponce).Result;
-            var content = responce.Content.ReadAsStringAsync().Result;
+            var jsonContent = JsonConvert.SerializeObject(requestModel);
+            var stringContent = new StringContent(jsonContent);
+            var response = _httpClient.PutAsync(_showcasePath, stringContent).Result;
+            var content = response.Content.ReadAsStringAsync().Result;
             Console.WriteLine(content);
         }
 
         public void GetShowcaseInformation()
         {
-            var resopnoce = _httpClient.GetAsync(_showcasePath).Result;
-            if (resopnoce.StatusCode == HttpStatusCode.OK)
+            var response = _httpClient.GetAsync(_showcasePath).Result;
+            if (response.StatusCode == HttpStatusCode.OK)
             {
-                var content = resopnoce.Content.ReadAsStringAsync().Result;
+                var content = response.Content.ReadAsStringAsync().Result;
                 var showcases = JsonConvert.DeserializeObject<List<Showcase>>(content);
                 Console.WriteLine("Showcases:");
                 foreach (var showcase in showcases)
@@ -119,15 +105,15 @@ namespace ShopHttp.ShopHttpClient.Controllers
 
         public void PlaceProductOnShowcase(int productId, int showcaseId)
         {
-            var newResponce = new HttpResponceModel()
+            var requestModel = new HttpModel()
             {
                 ProductId = productId,
                 ShowcaseId = showcaseId
             };
-            var jsonResponce = JsonConvert.SerializeObject(newResponce);
-            var stringResponce = new StringContent(jsonResponce);
-            var resopnce = _httpClient.PatchAsync(_showcasePath, stringResponce).Result;
-            var content = resopnce.Content.ReadAsStringAsync().Result;
+            var jsonContent = JsonConvert.SerializeObject(requestModel);
+            var stringContent = new StringContent(jsonContent);
+            var response = _httpClient.PatchAsync(_showcasePath, stringContent).Result;
+            var content = response.Content.ReadAsStringAsync().Result;
             Console.WriteLine(content);
         }
     }

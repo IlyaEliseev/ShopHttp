@@ -1,6 +1,6 @@
 ﻿using ShopHttp.ShopHttpServer.Controllers;
-using ShopHttp.ShopHttpServer.HttpResponceControllers;
-using ShopHttp.ShopHttpServer.Services;
+using ShopHttp.ShopHttpServer.HttpPathControllers;
+using ShopHttp.ShopHttpServer.HttpControllers;
 using System.Net;
 
 namespace ShopHttp.ShopHttpServer
@@ -11,7 +11,6 @@ namespace ShopHttp.ShopHttpServer
         {
             var httpListener = new HttpListener();
             httpListener.Prefixes.Add("http://localhost:44987/");
-            var checkService = new CheckService();
             IProductController productController = new ProductController();
             IShowcaseController showcaseController = new ShowcaseController(productController);
             IProductArchiveController productArchiveController = new ProductArchiveController(showcaseController);
